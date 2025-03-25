@@ -8,57 +8,6 @@ if (document.readyState !== "loading") {
   });
 }
 
-const bgColor = "#000";
-const shadowColor = "#000";
-
-const colorsArr = [
-  "#0D47A1",
-  bgColor,
-  bgColor,
-  "#01579B",
-  bgColor,
-  bgColor,
-  "#00695C",
-  bgColor,
-  bgColor,
-  "#1B5E20",
-  bgColor,
-  bgColor,
-  "#33691E",
-  bgColor,
-  bgColor,
-  "#827717",
-  bgColor,
-  bgColor,
-  "#F57F17",
-  bgColor,
-  bgColor,
-  "#FF6F00",
-  bgColor,
-  bgColor,
-  "#E65100",
-  bgColor,
-  bgColor,
-  "#BF360C",
-  bgColor,
-  bgColor,
-  "#B71C1C",
-  bgColor,
-  bgColor,
-  "#880E4F",
-  bgColor,
-  bgColor,
-  "#4A148C",
-  bgColor,
-  bgColor,
-  "#311B92",
-  bgColor,
-  bgColor,
-  "#1A237E",
-  bgColor,
-  bgColor,
-];
-
 const circleColors = [
   "#0D47A1",
   "#01579B",
@@ -89,7 +38,7 @@ class CirclesSpammm {
     this.canvas = null;
     this.speed = options?.speed || 1;
     this.circlesCurrent = 0;
-    this.circlesMax = options?.maxCircles || 10;
+    this.circlesMax = options?.maxCircles || 30;
     this.fps = options?.fps || 60;
     this.fpsInterval = 1000 / this.fps;
     this.then = Date.now();
@@ -131,7 +80,7 @@ class CirclesSpammm {
 
   drawCircles() {
     requestAnimationFrame(() => this.drawCircles());
-    const [cx, cy] = this.updateSpawnPosition();
+    this.updateSpawnPosition();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.frame += 1;
     if (this.frame >= this.spawnDelay && this.frame % this.spawnDelay === 0) {
@@ -142,7 +91,7 @@ class CirclesSpammm {
       }
     }
     for (let i = 0; i <= this.circlesCurrent; i++) {
-      this.drawCircle(i, cx, cy);
+      this.drawCircle(i);
     }
   }
 
@@ -154,18 +103,9 @@ class CirclesSpammm {
     const cy = dy < 0 ? Math.max(dy, -maxSpeed) : Math.min(dy, maxSpeed);
     this.x += cx;
     this.y += cy;
-    return [cx, cy];
   }
 
-  drawCircle(index, cx, cy) {
-    // const spawnPos = {
-    //   x: this.x - ((cx * 50) / index + 1),
-    //   y: this.y - ((cy * 50) / index + 1),
-    // };
-    const spawnPos = {
-      x: this.x,
-      y: this.y,
-    };
+  drawCircle(index) {
     let radiusModifier =
       this.frame < this.spawnDelay ? this.frame : this.frame % this.spawnDelay;
     let circleRadius =
@@ -178,7 +118,7 @@ class CirclesSpammm {
       this.ctx.globalAlpha = 1 - radiusModifier / this.spawnDelay;
     }
     this.ctx.fillStyle = this.getColorForIndex(index + this.colorShift);
-    this.ctx.arc(spawnPos.x, spawnPos.y, circleRadius, 0, Math.PI * 2, true);
+    this.ctx.arc(this.x, this.y, circleRadius, 0, Math.PI * 2, true);
     this.ctx.fill();
     this.ctx.closePath();
     this.ctx.restore();
@@ -187,8 +127,8 @@ class CirclesSpammm {
       this.ctx.beginPath();
       this.ctx.fillStyle = "#000000";
       this.ctx.arc(
-        spawnPos.x,
-        spawnPos.y,
+        this.x,
+        this.y,
         circleRadius - 10,
         0,
         Math.PI * 2,
